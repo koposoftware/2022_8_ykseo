@@ -66,7 +66,7 @@
 
 # 4. 본인 소개
 
-|이름      |서유경    |![ykseo](/ykseo.jpg)|
+|이름      |서유경    |<img src="ykseo.jpg" style="width:15%"/>|
 |연락처     |이메일    |syk322(@)naver.com|
 |skill set|Language|Java, Python, C, JavaScript, HTML, SQL, PL/SQL|
 |         |TOOLS   |Spring, Mybatis|
