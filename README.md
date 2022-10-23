@@ -29,8 +29,8 @@
 ## 3-4. ERD
 <img src="erd.png"/><br>
 
-## 3-5. 발표 ppt 
-[발표자료<img src="발표자료-001.png"/>](/2260341011_서유경_발표자료.pptx)<br>
+## 3-5. 발표자료
+[발표자료<img src="발표자료-001.png"/>](/2260341011_서유경_발표자료.pdf)<br>
 
 ## 3-6. 시연 동영상 
 <iframe width="828" height="480" src="https://www.youtube.com/embed/kIhcEC27FOY" title="한국폴리텍대학 광명융합기술교육원 2260341011 서유경 - 최종 프로젝트 시연영상" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
