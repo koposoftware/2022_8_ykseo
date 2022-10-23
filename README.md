@@ -33,11 +33,11 @@
 [발표자료<img src="발표자료-001.png"/>](/2260341011_서유경_발표자료.pptx)<br>
 
 ## 3-6. 시연 동영상 
-<iframe src="https://www.youtube.com/embed/kIhcEC27FOY" title="한국폴리텍대학 광명융합기술교육원 2260341011 서유경 - 최종 프로젝트 시연영상" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="828" height="480" src="https://www.youtube.com/embed/kIhcEC27FOY" title="한국폴리텍대학 광명융합기술교육원 2260341011 서유경 - 최종 프로젝트 시연영상" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## 3-7. 하나은행 OPEN API 문서
-[문서링크](https://summer-run-769.notion.site/HanaBank-2b896d4edcd641c584db929fc8341848)
-<img src="api_doc.png"/><br>
+[문서링크<img src="api_doc.png"/>](https://summer-run-769.notion.site/HanaBank-2b896d4edcd641c584db929fc8341848)
+
 
 
 ## 사용기술
