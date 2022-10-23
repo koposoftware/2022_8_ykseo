@@ -3,7 +3,7 @@
 [프로젝트 홈페이지](https://koposoftware.github.io/2022_8_ykseo/)
 
 # 1. 프로젝트 개요
-<img src="summary.png"/>
+<img src="summary.png" style="width:100%"/>
 
 ## 1-1. 프로젝트 배경
 - 상대적으로 위험부담이 적은 소액투자의 인기가 증가함에 따라 크라우드 펀딩 시장이 성장하고 있습니다. 세계은행(WB)에 따르면 전세계 크라우드펀딩 시장규모는 2015년 40조원에서 2020년 100조원대까지 확대된 것으로 나타났습니다. [출처 : 2022.06.12. 이뉴스투데이]
@@ -22,7 +22,7 @@
 # 3. 프로젝트 결과
 
 ## 3-1. 모두하나 투자 프로세스
-<img src="fund_process.png"/><br>
+<img src="fund_process.png" style="width:100%"/><br>
 모두하나의 투자 프로세스 입니다.
 다음과 같이 크게 5가지의 과정을 통해 하나의 프로젝트가 완성됩니다.
 
@@ -33,7 +33,7 @@
 5. 그에 따른 수익금을 반환하면, 관리자가 투자금을 정산합니다.
 
 ## 3-2. 서비스 아키텍처
-<img src="service_architecture.png"/><br>
+<img src="service_architecture.png" style="width:100%"/><br>
 - 투자자는 예치금 계좌의 생성과 조회, 이체 서비스를 사용할 수 있습니다.
 - 투자자는 프로젝트(투자상품)에 투자할 수 있습니다.
 - 투자자는 투자 내역 및 현황을 포함한 회원정보를 확인할 수 있습니다.
@@ -78,16 +78,16 @@
 - SVN : Git
 
 ## 4-3. ERD
-<img src="erd.png"/><br>
+<img src="erd.png" style="width:100%"/><br>
 
 ## 4-4. 프로젝트 아키텍처
-<img src="project_architecture.png"/><br>
+<img src="project_architecture.png" style="width:100%"/><br>
 - 2개의 DB Server는 Oracle 클라우드에 Oracle RDBMS 19c를 설치하여 구축하였습니다.
 - 하나은행 API는 AWS 클라우드에 Apache2 WS, Tomcat9 WAS를 구축하여 deploy하였습니다.
 
 ## 4-5. 프로젝트 일정
 2022.09.16 ~ 2022.10.24
-<img src="gantt_chart.png"/><br>
+<img src="gantt_chart.png" style="width:100%"/><br>
 
 
 # 5. 본인 소개
