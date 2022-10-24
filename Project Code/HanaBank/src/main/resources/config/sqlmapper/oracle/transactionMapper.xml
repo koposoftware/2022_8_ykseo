@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.TransactionDAO">
+	<resultMap type="transactionVO" id="transactionVO">
+		<result column="TRANSACTION_SEQ" property="transactionSeq" />
+		<result column="ACTIVE_ACCT_NO" property="activeAcctNo" />
+		<result column="TYPE_CODE" property="typeCode" />
+		<result column="TYPE_NAME" property="typeName" />
+		<result column="DEAL_BANK_CODE" property="dealBankCode" />
+		<result column="DEAL_BANK_NAME" property="dealBankName" />
+		<result column="DEAL_ACCT_NO" property="dealAcctNo" />
+		<result column="DEAL_NAME" property="dealName" />
+		<result column="REG_DATE" property="regDate" />
+	</resultMap>
+	<resultMap type="java.util.HashMap" id="test">
+		<result javaType="java.lang.String" column="key" property="key"/>
+		<result javaType="java.lang.Integer" column="status" property="status"/>
+	</resultMap>
+	
+	<!-- select -->
+	<select id="selectAllByAccountNo" parameterType="String"
+		resultMap="transactionVO">
+		SELECT T.ACTIVE_ACCT_NO
+			, T.TYPE_CODE
+			, C.NAME AS TYPE_NAME
+			, T.NAME
+            , T.AMOUNT
+			, T.BALANCE
+			, T.DEAL_BANK_CODE
+			, C2.NAME AS DEAL_BANK_NAME
+			, T.DEAL_ACCT_NO
+			, T.REG_DATE
+		FROM TRANSACTION T, COMM_CODE C, COMM_CODE C2
+		WHERE T.TYPE_CODE = C.CODE
+		AND C.CODE_ID = 300
+        AND T.DEAL_BANK_CODE = C2.CODE
+        AND C2.CODE_ID = 100
+		AND ACTIVE_ACCT_NO = #{transactionNo}
+		ORDER BY REG_DATE DESC
+	</select>
+	
+	<!-- procedure -->
+	<select id="procedureTransfer" parameterType="map"
+		statementType="CALLABLE">
+		{
+			CALL P_HANA_BANK.TRANSFER(
+				#{activeAcctNo}
+				, #{typeCode} 
+				, #{name} 
+				, #{amount} 
+				, #{dealBankCode} 
+				, #{dealAcctNo} 
+				, #{dealName} 
+				, #{password} 
+				, #{result, mode=OUT, jdbcType=INTEGER, javaType=int}
+			)
+		}
+	</select>
+	
+	<!-- block -->
+	<select id="blockMultiTransfer" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+		BEGIN
+		
+			<foreach collection="transferMap" item="transactionVO" index="key">
+		     P_HANA_BANK.TRANSFER(
+				#{transactionVO.activeAcctNo}
+				, #{transactionVO.typeCode} 
+				, #{transactionVO.name} 
+				, #{transactionVO.amount} 
+				, #{transactionVO.dealBankCode} 
+				, #{transactionVO.dealAcctNo} 
+				, #{transactionVO.dealName} 
+				, #{transactionVO.password} 
+				, #{transactionVO.status} 
+			);
+		    </foreach>
+		    
+		END
+	}
+	</select>
+	
+</mapper>

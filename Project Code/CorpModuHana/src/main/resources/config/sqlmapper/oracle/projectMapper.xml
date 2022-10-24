@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ProjectDAO">
+	<resultMap type="projectVO" id="projectVO">
+		<result column="PROJECT_SEQ" property="projectSeq" />
+		<result column="SUBJECT_NO" property="subjectNo" />
+		<result column="SUBJECT_NAME" property="subjectName" />
+		<result column="SIGN_IMG_PATH" property="signImgPath" />
+		<result column="SIGN_IMG_NAME" property="signImgName" />
+		<result column="FUND_AMT" property="fundAmt" />
+		<result column="FUND_AMT_PER" property="fundAmtPer" />
+		<result column="MIN_FUND_UNIT" property="minFundUnit" />
+		<result column="MAX_FUND_UNIT" property="maxFundUnit" />
+		<result column="MIN_FUND_AMT" property="minFundAmt" />
+		<result column="MAX_FUND_AMT" property="maxFundAmt" />
+		<result column="FUND_START" property="fundStart" />
+		<result column="FUND_END" property="fundEnd" />
+		<result column="START_D_DAY" property="startDDay" />
+		<result column="END_D_DAY" property="endDDay" />
+		<result column="PROGRESS_CODE" property="progressCode" />
+		<result column="PROGRESS_NAME" property="progressName" />
+		<result column="REG_DATE" property="regDate" />
+		<result column="APPLY_DATE" property="applyDate" />
+		<result column="APRV_DATE" property="aprvDate" />
+		<result column="CORP_REG_NO" property="corpRegNo" />
+		<result column="CORP_NAME" property="corpName" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="EST_BEP" property="estBep" />
+		<result column="SECURITY_TYPE" property="securityType" />
+		<result column="SECURITY_NAME" property="securityName" />
+		<result column="REPAYMENT_CODE" property="repaymentCode" />
+		<result column="REPAYMENT_NAME" property="repaymentName" />
+		<result column="SECURITY_DATE" property="securityDate" />
+		<result column="SECURITY_EXPIRE" property="securityExpire" />
+		<result column="REPAYMENT_DATE" property="repaymentDate" />
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT P.PROJECT_SEQ
+			, P.SUBJECT_NO
+			, C.NAME AS SUBJECT_NAME
+			, P.TITLE
+			, P.SUMMARY
+			, P.CONTENT
+			, P.FUND_AMT
+			, TO_CHAR(ROUND(P.FUND_AMT / P.MAX_FUND_AMT * 100, 1)||'%') AS FUND_AMT_PER
+			, P.MIN_FUND_UNIT
+			, P.MAX_FUND_UNIT
+			, P.MIN_FUND_AMT
+			, P.MAX_FUND_AMT
+			, TO_CHAR(P.FUND_START, 'YYYY-MM-DD') AS FUND_START
+			, TO_CHAR(P.FUND_END, 'YYYY-MM-DD') AS FUND_END
+			, P.FUND_START - TRUNC(SYSDATE) AS START_D_DAY
+			, P.FUND_END - TRUNC(SYSDATE) AS END_D_DAY
+			, P.PROGRESS_CODE
+			, C2.NAME AS PROGRESS_NAME
+			, P.CORP_REG_NO
+			, CORP.NAME AS CORP_NAME
+            , P.ACCOUNT_NO
+            , P.EST_BEP
+            , P.SECURITY_TYPE
+            , C3.NAME AS SECURITY_NAME
+            , P.REPAYMENT_CODE
+            , C4.NAME AS REPAYMENT_NAME
+            , TO_CHAR(P.SECURITY_DATE, 'YYYY-MM-DD') AS SECURITY_DATE
+            , TO_CHAR(P.SECURITY_EXPIRE, 'YYYY-MM-DD') AS SECURITY_EXPIRE
+            , P.REPAYMENT
+            , P.REPAYMENT_DATE
+			, F.PATH AS SIGN_IMG_PATH
+			, F.SAVE_NAME AS SIGN_IMG_NAME
+		FROM PROJECT P, PROJECT_FILE F, CORPORATION CORP, COMM_CODE C, COMM_CODE C2, COMM_CODE C3, COMM_CODE C4
+		WHERE P.CORP_REG_NO = CORP.REG_NO
+		AND NVL(P.SUBJECT_NO, 0) = C.CODE
+		AND NVL(P.PROGRESS_CODE, 0) = C2.CODE
+		AND NVL(P.SECURITY_TYPE, 0) = C3.CODE
+		AND NVL(P.REPAYMENT_CODE, 0) = C4.CODE
+		AND C.CODE_ID = 210
+		AND C.AVAILABLE = 'Y'
+		AND C2.CODE_ID = 200
+		AND C2.AVAILABLE = 'Y'
+		AND C3.CODE_ID = 110
+		AND C3.AVAILABLE = 'Y'
+		AND C4.CODE_ID = 120
+		AND C4.AVAILABLE = 'Y'
+		AND P.PROJECT_SEQ = F.PROJECT_SEQ
+        AND F.TYPE_CODE = 0
+	</sql>
+	<sql id="selectOrder">
+		ORDER BY P.REG_DATE DESC
+	</sql>
+	
+	
+	<!-- select -->
+	<select id="selectByProjectSeq" parameterType="String"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		AND P.PROJECT_SEQ = #{ projectSeq }
+	</select>
+	<select id="selectByCorpRegNo" parameterType="String"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		AND P.CORP_REG_NO = #{ corpRegNo }
+		<include refid="selectOrder" />
+	</select>
+	<select id="selectByCorpRegNoAndProgressCode" parameterType="projectVO"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		AND P.CORP_REG_NO = #{ corpRegNo }
+		AND P.PROGRESS_CODE = #{ progressCode }
+		<include refid="selectOrder" />
+	</select>
+	<select id="selectTotalFundAmt" parameterType="String" resultType="map">
+		SELECT TO_CHAR(SUM(FUND_AMT), 'FM999,999,999') AS TOTAL_FUND_AMT 
+		FROM PROJECT WHERE CORP_REG_NO = #{ corpRegNo }
+	</select>
+	<select id="selectInProgressProjectSize" parameterType="String" resultType="map">
+		SELECT COUNT(*) AS INPROGRESS_PROJECT_SIZE 
+		FROM PROJECT 
+		WHERE PROGRESS_CODE = 3 AND CORP_REG_NO = #{ corpRegNo }
+	</select>
+	<select id="selectWritingProjectSize" parameterType="String" resultType="map">
+		SELECT COUNT(*) AS WRITING_PROJECT_SIZE 
+		FROM PROJECT 
+		WHERE PROGRESS_CODE = 9 AND CORP_REG_NO = #{ corpRegNo }
+	</select>
+	<select id="selectAccumulatedFundAmtByProjectSeq" parameterType="String" resultType="map">
+		SELECT TO_CHAR(DATES, 'YYYY-MM-DD') AS DAY, SUM(NVL(AMOUNT, 0)) OVER(ORDER BY DATES) AS AMOUNT
+		FROM (SELECT FUND_START + LEVEL - 1 AS DATES
+		        FROM (SELECT FUND_START, SYSDATE
+		        FROM PROJECT
+		        WHERE PROJECT_SEQ = #{ projectSeq }) 
+		        CONNECT BY LEVEL  <![CDATA[<=]]> (SYSDATE - FUND_START) + 1) 
+		    LEFT OUTER JOIN (SELECT FUND_DATE, SUM(AMOUNT) AS AMOUNT
+		        FROM FUND
+		        WHERE PROJECT_SEQ = #{ projectSeq }
+		        GROUP BY FUND_DATE)
+		ON DATES = FUND_DATE
+		ORDER BY DATES
+	</select>
+	
+	
+	<!-- DML -->
+	<update id="updateStep2PartByProjectSeq" parameterType="projectVO">
+		UPDATE PROJECT SET
+			SUBJECT_NO = #{ subjectNo }
+			, TITLE = #{ title }
+			, SUMMARY = #{ summary }
+			, CONTENT = #{ content, jdbcType=CLOB }
+		WHERE PROJECT_SEQ = #{ projectSeq }
+	</update>
+	<update id="updateStep3PartByProjectSeq" parameterType="projectVO">
+		UPDATE PROJECT SET
+			FUND_START = #{ fundStart }
+			, FUND_END = #{ fundEnd }
+			, SECURITY_DATE = #{ securityDate }
+			, SECURITY_EXPIRE = #{ securityExpire }
+			, MIN_FUND_AMT = #{ minFundAmt }
+			, MAX_FUND_AMT = #{ maxFundAmt }
+			, MIN_FUND_UNIT = #{ minFundUnit }
+			, MAX_FUND_UNIT = #{ maxFundUnit }
+			, EST_BEP = #{ estBep }
+			, SECURITY_TYPE = #{ securityType }
+			, REPAYMENT_CODE = #{ repaymentCode }
+		WHERE PROJECT_SEQ = #{ projectSeq }
+	</update>
+	<update id="updateProgressCodeByProjectSeq" parameterType="String">
+		UPDATE PROJECT SET PROGRESS_CODE = 0
+		WHERE PROJECT_SEQ = #{ projectSeq }
+	</update>
+	
+	
+	<!-- block -->
+	<select id="blockInsertReturnProjectSeq" parameterType="projectVO" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+		    V_PROJECT_SEQ	PROJECT.PROJECT_SEQ%TYPE;
+		BEGIN
+		    
+		    V_PROJECT_SEQ := SEQ_PROJECT.NEXTVAL;
+		    
+		    INSERT INTO PROJECT(PROJECT_SEQ, SUBJECT_NO, TITLE, SUMMARY, CONTENT, MIN_FUND_UNIT, MAX_FUND_UNIT, MIN_FUND_AMT, MAX_FUND_AMT, FUND_START, FUND_END, APRV_DATE, CORP_REG_NO, ACCOUNT_NO, EST_BEP, SECURITY_TYPE, REPAYMENT_CODE, SECURITY_DATE, SECURITY_EXPIRE, REPAYMENT, REPAYMENT_DATE)
+		    VALUES(V_PROJECT_SEQ, #{subjectNo}, #{title}, #{summary}, #{content, jdbcType=CLOB }, #{minFundUnit}, #{maxFundUnit}, #{minFundAmt}, #{maxFundAmt}, #{fundStart}, #{fundEnd}, #{aprvDate}, #{corpRegNo}, #{accountNo}, #{estBep}, #{securityType}, #{repaymentCode}, #{securityDate}, #{securityExpire}, #{repayment}, #{repaymentDate} );
+		    
+		    COMMIT;
+		    
+		    #{ projectSeq, mode=OUT, jdbcType=VARCHAR, javaType=String } := V_PROJECT_SEQ;
+		
+		END
+	}
+	</select>
+	
+</mapper>

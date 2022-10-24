@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.NoticeDAO">
+	<resultMap type="noticeVO" id="noticeVO">
+		<result column="NOTICE_SEQ" property="noticeSeq" />
+		<result column="PROJECT_SEQ" property="projectSeq" />
+		<result column="VIEW_CNT" property="viewCnt" />
+		<result column="REG_DATE" property="regDate" />
+	</resultMap>
+
+	<!-- select -->
+	<select id="selectByProjectSeq" parameterType="String" resultMap="noticeVO">
+		SELECT NOTICE_SEQ
+			, PROJECT_SEQ
+			, WRITER
+			, TITLE
+			, CONTENT
+			, VIEW_CNT, TO_CHAR(REG_DATE, 'YYYY-MM-DD') AS REG_DATE
+		FROM NOTICE
+		WHERE PROJECT_SEQ = #{ projectSeq }
+		ORDER BY REG_DATE DESC
+	</select>
+	<select id="selectByNoticeSeq" parameterType="String" resultMap="noticeVO">
+		SELECT NOTICE_SEQ
+			, PROJECT_SEQ
+			, WRITER
+			, TITLE
+			, CONTENT
+			, VIEW_CNT
+			, TO_CHAR(REG_DATE, 'MON dd, YYYY HH:MI:SS') AS REG_DATE
+		FROM NOTICE
+		WHERE NOTICE_SEQ = #{ noticeSeq }
+		ORDER BY REG_DATE DESC
+	</select>
+</mapper>

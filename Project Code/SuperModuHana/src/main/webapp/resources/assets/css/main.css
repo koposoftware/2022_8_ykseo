@@ -1,0 +1,132 @@
+@charset "UTF-8";
+
+/*--------------------------------------------------------------
+# Set main reusable colors and fonts using CSS variables
+# Learn more about CSS variables at https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
+--------------------------------------------------------------*/
+/* Fonts */
+:root {
+  --font-default: "Happiness-Sans-bold", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-primary: "Happiness-Sans-Title", sans-serif;
+  --font-secondary: "Work Sans", sans-serif;
+}
+
+
+
+/*--------------------------------------------------------------
+# Font
+--------------------------------------------------------------*/
+@font-face {
+    font-family: 'Happiness-Sans-Title';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/Happiness-Sans-Title.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Happiness-Sans-Bold';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/Happiness-Sans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+
+/* Colors */
+:root {
+  --color-default: #364d59;
+  --color-primary: #e90061;
+  --color-secondary: #52565e;
+}
+
+.blog-pagination {
+  margin-top: 30px;
+  color: #838893;
+}
+
+.blog-pagination ul {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.blog-pagination li {
+  margin: 0 5px;
+  transition: 0.3s;
+}
+
+.blog-pagination li a {
+  color: var(--color-secondary);
+  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-pagination li.active,
+.blog-pagination li:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.blog-pagination li.active a,
+.blog-pagination li:hover a {
+  color: var(--color-white);
+}
+
+
+.modal {
+	background-color: rgb(0, 0, 0, 0.3);
+}
+
+.modal-dialog {
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.modal-title {
+	font-weight: 1000;
+	color: var(--color-primary);
+}
+
+.modal .modal-body {
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+.modal .modal-body select {
+	margin: 0.5rem 0.5rem 1.5rem 0;
+	width: calc(41.66666667% - 0.5rem);
+	padding: .5em .5em;
+	font-family: inherit;
+	background: url(https://farm1.staticflickr.com/379/19928272501_4ef877c265_t.jpg) no-repeat 95% 50%;  
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	border: 1px solid #999;
+	border-radius: 7px;
+	height: 43px;
+}
+
+.modal .modal-body input {
+	border: 1px solid #999;
+	border-radius: 7px;
+    padding: .5em .5em;
+	margin: 0.5rem 0 1.5rem 0;
+	height: 43px;
+}
+
+.modal .modal-body p {
+	margin-bottom: 5px;
+	font-weight: 800;
+}
+
+.modal .modal-body span {
+	margin-bottom: 0px;
+	font-size: 0.8rem;
+	font-weight: 500;
+}
+
+.btn {
+	font-size:1rem !important;
+}

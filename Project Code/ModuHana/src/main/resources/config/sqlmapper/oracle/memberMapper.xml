@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.MemberDAO">
+	<resultMap type="memberVO" id="memberVO">
+		<result column="reg_no_front" property="regNoFront" />
+		<result column="reg_no_back" property="regNoBack" />
+		<result column="basic_addr" property="basicAddr" />
+		<result column="detail_addr" property="detailAddr" />
+		<result column="reg_Date" property="regDate" />
+	</resultMap>
+
+	<!-- select -->
+	<select id="selectByIdAndPwd" parameterType="memberVO"
+		resultType="memberVO">
+		select ID
+			, NAME
+			, PHONE
+		from member where id = #{ id } and pwd = #{ pwd }
+	</select>
+	<select id="selectById" parameterType="memberVO"
+		resultType="memberVO">
+		select ID
+			, NAME
+			, PHONE
+		from member where id = #{ id }
+	</select>
+	<select id="selectAllINfoById" parameterType="String"
+		resultMap="memberVO">
+		select * from member where id = #{ id }
+	</select>
+
+	<!-- DML -->
+	<insert id="insert" parameterType="memberVO">
+		INSERT INTO MEMBER(id, pwd, name, phone, email, country_code, basic_addr, detail_addr, post) 
+		VALUES(#{ id }, #{ pwd }, #{ name }, #{ phone }, #{ email }, #{ countryCode }, #{ basicAddr }, #{ detailAddr }, #{ post })
+	</insert>
+	<update id="updateRegNo" parameterType="memberVO">
+		UPDATE MEMBER SET REG_NO_FRONT = #{ regNoFront }, REG_NO_BACK = #{ regNoBack } WHERE ID = #{ id }
+	</update>
+</mapper>

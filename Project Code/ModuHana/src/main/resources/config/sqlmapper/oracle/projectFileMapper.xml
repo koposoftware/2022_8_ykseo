@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ProjectFileDAO">
+	<resultMap type="projectFileVO" id="projectFileVO">
+		<result column="FILE_SEQ" property="fileSeq" />
+		<result column="PROJECT_SEQ" property="projectSeq" />
+		<result column="TYPE_CODE" property="typeCode" />
+		<result column="TYPE_NAME" property="typeName" />
+		<result column="ORI_NAME" property="oriName" />
+		<result column="SAVE_NAME" property="saveName" />
+		<result column="FILE_SIZE" property="fileSize" />
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT FILE_SEQ
+			, PROJECT_SEQ
+			, TYPE_CODE
+			, C.NAME AS TYPE_NAME
+			, PATH
+			, ORI_NAME
+			, SAVE_NAME
+			, FILE_SIZE
+		FROM PROJECT_FILE F, COMM_CODE C
+		WHERE F.TYPE_CODE = C.CODE
+        AND C.CODE_ID = 220
+	</sql>
+	
+	
+	<!-- select -->
+	<select id="selectByProjectSeqAndTypeCode" parameterType="map"
+		resultMap="projectFileVO">
+		<include refid="selectColumn" />
+		AND PROJECT_SEQ = #{ projectSeq }
+		AND TYPE_CODE IN 
+		<foreach collection="typeCodeList" item="typeCode" open="(" close=")" separator=",">
+		 #{typeCode}
+		</foreach>
+	</select>
+</mapper>

@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ProjectDAO">
+	<resultMap type="projectVO" id="projectVO">
+		<result column="PROJECT_SEQ" property="projectSeq" />
+		<result column="SUBJECT_NO" property="subjectNo" />
+		<result column="SUBJECT_NAME" property="subjectName" />
+		<result column="SIGN_IMG_PATH" property="signImgPath" />
+		<result column="SIGN_IMG_NAME" property="signImgName" />
+		<result column="FUND_AMT" property="fundAmt" />
+		<result column="FUND_AMT_PER" property="fundAmtPer" />
+		<result column="MIN_FUND_UNIT" property="minFundUnit" />
+		<result column="MAX_FUND_UNIT" property="maxFundUnit" />
+		<result column="MIN_FUND_AMT" property="minFundAmt" />
+		<result column="MAX_FUND_AMT" property="maxFundAmt" />
+		<result column="FUND_START" property="fundStart" />
+		<result column="FUND_END" property="fundEnd" />
+		<result column="START_D_DAY" property="startDDay" />
+		<result column="END_D_DAY" property="endDDay" />
+		<result column="PROGRESS_CODE" property="progressCode" />
+		<result column="PROGRESS_NAME" property="progressName" />
+		<result column="REG_DATE" property="regDate" />
+		<result column="APPLY_DATE" property="applyDate" />
+		<result column="APRV_DATE" property="aprvDate" />
+		<result column="CORP_REG_NO" property="corpRegNo" />
+		<result column="CORP_NAME" property="corpName" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="EST_BEP" property="estBep" />
+		<result column="SECURITY_TYPE" property="securityType" />
+		<result column="SECURITY_NAME" property="securityName" />
+		<result column="REPAYMENT_CODE" property="repaymentCode" />
+		<result column="REPAYMENT_NAME" property="repaymentName" />
+		<result column="SECURITY_DATE" property="securityDate" />
+		<result column="SECURITY_EXPIRE" property="securityExpire" />
+		<result column="REPAYMENT_DATE" property="repaymentDate" />
+	</resultMap>
+	<resultMap type="java.lang.Double" id="doubleList">
+		<result property="" column="COL_VAL"/>
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT P.PROJECT_SEQ
+			, P.SUBJECT_NO
+			, C.NAME AS SUBJECT_NAME
+			, P.TITLE
+			, P.SUMMARY
+			, P.CONTENT
+			, P.FUND_AMT
+			, TO_CHAR(ROUND(P.FUND_AMT / P.MAX_FUND_AMT * 100, 1)) AS FUND_AMT_PER
+			, P.MIN_FUND_UNIT
+			, P.MAX_FUND_UNIT
+			, P.MIN_FUND_AMT
+			, P.MAX_FUND_AMT
+			, TO_CHAR(P.FUND_START, 'YYYY-MM-DD') AS FUND_START
+			, TO_CHAR(P.FUND_END, 'YYYY-MM-DD') AS FUND_END
+			, P.FUND_START - TRUNC(SYSDATE) AS START_D_DAY
+			, P.FUND_END - TRUNC(SYSDATE) AS END_D_DAY
+			, P.PROGRESS_CODE
+			, C2.NAME AS PROGRESS_NAME
+			, P.REG_DATE
+			, P.APPLY_DATE
+			, P.APRV_DATE
+			, P.CORP_REG_NO
+			, CORP.NAME AS CORP_NAME
+            , P.ACCOUNT_NO
+            , P.EST_BEP
+            , P.SECURITY_TYPE
+            , C3.NAME AS SECURITY_NAME
+            , P.REPAYMENT_CODE
+            , C4.NAME AS REPAYMENT_NAME
+            , TO_CHAR(P.SECURITY_DATE, 'YYYY-MM-DD') AS SECURITY_DATE
+            , TO_CHAR(P.SECURITY_EXPIRE, 'YYYY-MM-DD') AS SECURITY_EXPIRE
+            , P.REPAYMENT
+            , P.REPAYMENT_DATE
+			, F.PATH AS SIGN_IMG_PATH
+			, F.SAVE_NAME AS SIGN_IMG_NAME
+		FROM PROJECT P, PROJECT_FILE F, CORPORATION CORP, COMM_CODE C, COMM_CODE C2, COMM_CODE C3, COMM_CODE C4
+		WHERE P.CORP_REG_NO = CORP.REG_NO
+		AND NVL(P.SUBJECT_NO, 0) = C.CODE
+		AND NVL(P.PROGRESS_CODE, 0) = C2.CODE
+		AND NVL(P.SECURITY_TYPE, 0) = C3.CODE
+		AND NVL(P.REPAYMENT_CODE, 0) = C4.CODE
+		AND C.CODE_ID = 210
+		AND C.AVAILABLE = 'Y'
+		AND C2.CODE_ID = 200
+		AND C2.AVAILABLE = 'Y'
+		AND C3.CODE_ID = 110
+		AND C3.AVAILABLE = 'Y'
+		AND C4.CODE_ID = 120
+		AND C4.AVAILABLE = 'Y'
+		AND P.PROJECT_SEQ = F.PROJECT_SEQ
+        AND F.TYPE_CODE = 0
+	</sql>
+	<sql id="OrderRegDate">
+		ORDER BY P.PROGRESS_CODE, P.REG_DATE DESC
+	</sql>
+	<sql id="OrderApplyDate">
+		ORDER BY P.PROGRESS_CODE, P.APPLY_DATE DESC
+	</sql>
+	<sql id="OrderAprvDate">
+		ORDER BY P.PROGRESS_CODE, P.APRV_DATE DESC
+	</sql>
+	<sql id="selectFive">
+        OFFSET 0 ROWS
+        FETCH NEXT 5 ROWS ONLY
+	</sql>
+	
+	<!-- select -->
+	<select id="selectByProjectSeq" parameterType="String" resultMap="projectVO">
+		<include refid="selectColumn" />
+		AND P.PROJECT_SEQ = #{ projectSeq }
+	</select>
+	<select id="selectProjectListNeedRepayment" resultMap="projectVO">
+		SELECT PROJECT_SEQ, PROGRESS_CODE, SECURITY_EXPIRE
+		FROM PROJECT
+		WHERE <![CDATA[ SECURITY_EXPIRE <= SYSDATE ]]>
+		AND PROGRESS_CODE IN (4, 11)
+	</select>
+	<select id="selectCropEmailByProjectSeq" parameterType="String" resultType="String">
+		SELECT EMAIL
+        FROM PROJECT P, CORPORATION C
+        WHERE P.CORP_REG_NO = C.REG_NO
+        AND PROJECT_SEQ = #{ projectSeq }
+	</select>
+	
+	<!-- block -->
+	<select id="blockSelectProjectClassifiedByProgressCode" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+		    V_AWAITING_PROJECT_LIST	    SYS_REFCURSOR;
+		    V_INPROGRESS_PROJECT_LIST	SYS_REFCURSOR;
+		    V_SUCCESS_PROJECT_LIST      SYS_REFCURSOR;
+		    V_FINISHED_PROJECT_LIST     SYS_REFCURSOR;
+		    V_CANCELLED_PROJECT_LIST	SYS_REFCURSOR;
+		    V_COUNT_AWATING_PROJECTS	NUMBER;
+		BEGIN
+		    
+		    OPEN V_AWAITING_PROJECT_LIST FOR 
+		    	<include refid="selectColumn" />
+		        AND P.PROGRESS_CODE IN (0, 1, 2)
+		        ORDER BY P.PROGRESS_CODE, P.REG_DATE DESC
+		        <include refid="selectFive"/>;
+		
+		    OPEN V_INPROGRESS_PROJECT_LIST FOR
+		    	<include refid="selectColumn" />
+		        AND P.PROGRESS_CODE IN (3)
+		        ORDER BY P.PROGRESS_CODE, P.FUND_END DESC
+		        <include refid="selectFive"/>;
+		        
+		    OPEN V_SUCCESS_PROJECT_LIST FOR 
+		        <include refid="selectColumn" />
+		        AND P.PROGRESS_CODE IN (4, 10, 11)
+		        ORDER BY CASE WHEN P.PROGRESS_CODE = 11 THEN 1
+						WHEN P.PROGRESS_CODE = 4 THEN 2
+						WHEN P.PROGRESS_CODE = 10 THEN 3
+						ELSE 4
+					END, P.SECURITY_EXPIRE
+		        <include refid="selectFive"/>;
+		        
+		    OPEN V_FINISHED_PROJECT_LIST FOR 
+		        <include refid="selectColumn" />
+		        AND P.PROGRESS_CODE IN (5)
+		        ORDER BY P.PROGRESS_CODE, P.FUND_END DESC
+		        <include refid="selectFive"/>;
+		    
+		    OPEN V_CANCELLED_PROJECT_LIST FOR 
+		        <include refid="selectColumn" />
+		        AND P.PROGRESS_CODE IN (6, 7, 8)
+		        ORDER BY P.REG_DATE DESC
+		        <include refid="selectFive"/>;
+	        
+	        SELECT TO_CHAR(COUNT(*)) INTO V_COUNT_AWATING_PROJECTS 
+	        FROM PROJECT 
+	        WHERE PROGRESS_CODE = 0;
+		        
+        	#{awaitingProjectList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO} := V_AWAITING_PROJECT_LIST;
+		    #{inProgressProjectList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO} := V_INPROGRESS_PROJECT_LIST;
+		    #{successProjectList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO} := V_SUCCESS_PROJECT_LIST;
+		    #{finishedProjectList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO} := V_FINISHED_PROJECT_LIST;
+		    #{cancelledProjectList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO} := V_CANCELLED_PROJECT_LIST;
+		    #{countAwaitingProjects, mode=OUT, jdbcType=INTEGER, javaType=Integer} := V_COUNT_AWATING_PROJECTS;
+		    
+		END
+	}
+	</select>
+	<select id="blockGetHeadValues" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+			V_TOTAL_FUND_AMT	VARCHAR2(15);
+			V_TOTAL_MEMBER		VARCHAR2(10);
+			V_AVG_PAYOFF		VARCHAR2(5);
+		BEGIN
+
+			SELECT TO_CHAR(SUM(P.FUND_AMT), 'FM999,999,999,999') INTO V_TOTAL_FUND_AMT 
+	        FROM PROJECT P
+	        WHERE P.PROGRESS_CODE IN (4, 5, 10, 11);
+		
+			SELECT TO_CHAR(COUNT(*), 'FM999,999') INTO V_TOTAL_MEMBER
+        	FROM MEMBER M;
+        	
+        	SELECT TO_CHAR(ROUND(AVG((P.REPAYMENT / P.FUND_AMT) - 1) * 100, 1)) INTO V_AVG_PAYOFF
+	        FROM PROJECT P
+	        WHERE P.PROGRESS_CODE IN (5);
+		    
+		    #{totalFundAmt, mode=OUT, jdbcType=VARCHAR, javaType=String} := V_TOTAL_FUND_AMT;
+		    #{totalMember, mode=OUT, jdbcType=VARCHAR, javaType=String} := V_TOTAL_MEMBER;
+		    #{avgPayoff, mode=OUT, jdbcType=VARCHAR, javaType=String} := V_AVG_PAYOFF;
+		    
+		END
+	}
+	</select>
+	<select id="blockGetSexRatio" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+			V_MAN           NUMBER;
+			V_WOMAN			NUMBER;
+		BEGIN
+		
+            SELECT RATIO INTO V_MAN FROM (
+                SELECT SEX, ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 1) AS RATIO
+                <choose>
+					<when test ="projectSeq != null and projectSeq != ''">
+						FROM MEMBER M, ACCOUNT A, FUND F
+		                WHERE M.ID = A.MEMBER_ID
+		                AND A.ACCOUNT_NO = F.MEMBER_ACCOUNT_NO
+		                AND PROJECT_SEQ = #{ projectSeq }
+					</when>
+					<otherwise>
+						FROM MEMBER
+					</otherwise>
+				</choose>
+                GROUP BY SEX
+            ) WHERE SEX = 'M';
+            
+            SELECT RATIO INTO V_WOMAN FROM (
+                SELECT SEX, ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 1) AS RATIO
+                <choose>
+					<when test ="projectSeq != null and projectSeq != ''">
+						FROM MEMBER M, ACCOUNT A, FUND F
+		                WHERE M.ID = A.MEMBER_ID
+		                AND A.ACCOUNT_NO = F.MEMBER_ACCOUNT_NO
+		                AND PROJECT_SEQ = #{ projectSeq }
+					</when>
+					<otherwise>
+						FROM MEMBER
+					</otherwise>
+				</choose>
+                GROUP BY SEX
+            ) WHERE SEX = 'F';
+		    
+            #{man, mode=OUT, jdbcType=NUMERIC, javaType=Double} := V_MAN;
+            #{woman, mode=OUT, jdbcType=NUMERIC, javaType=Double} := V_WOMAN;
+		    
+		END
+	}
+	</select>
+	<select id="blockGetSubjectRatio" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+			CUR_SUBJECT_RATIO	SYS_REFCURSOR;
+		BEGIN
+		
+			OPEN CUR_SUBJECT_RATIO FOR
+            	SELECT C.NAME AS SUBJECT_NAME
+            		, P.SUBJECT_NO
+            		, COUNT(*) AS ratio
+                FROM PROJECT P, COMM_CODE C
+                WHERE C.CODE_ID = 210
+                AND C.CODE = P.SUBJECT_NO
+                GROUP BY C.NAME, P.SUBJECT_NO
+                ORDER BY RATIO DESC;
+                
+		    #{ subjectRatioList, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=projectVO } := CUR_SUBJECT_RATIO;
+		END
+	}
+	</select>
+	<select id="blockGetMonthFundAmt" resultMap="doubleList">
+		SELECT COL_VAL
+		FROM (
+		    SELECT
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(SYSDATE, 'MM'),AMOUNT,0)) AS  M0, 
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(ADD_MONTHS(SYSDATE, -1), 'MM'),AMOUNT,0)) AS  M1, 
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(ADD_MONTHS(SYSDATE, -2), 'MM'),AMOUNT,0)) AS  M2, 
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(ADD_MONTHS(SYSDATE, -3), 'MM'),AMOUNT,0)) AS  M3, 
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(ADD_MONTHS(SYSDATE, -4), 'MM'),AMOUNT,0)) AS  M4, 
+		        SUM(DECODE(TO_CHAR(FUND_DATE, 'MM'), TO_CHAR(ADD_MONTHS(SYSDATE, -5), 'MM'),AMOUNT,0)) AS  M5
+			FROM FUND
+			WHERE TO_CHAR(FUND_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+		)  
+		UNPIVOT (COL_VAL FOR COL_NM IN(M0, M1, M2, M3, M4, M5))
+	</select>
+	
+	<!-- DML -->
+	<update id="updateProgressCodeByProjectSeq" parameterType="projectVO">
+		UPDATE PROJECT SET PROGRESS_CODE = #{ progressCode }
+		WHERE PROJECT_SEQ = #{ projectSeq } 
+	</update>
+	<update id="updateAccountNoByProjectSeq" parameterType="projectVO">
+		UPDATE PROJECT SET ACCOUNT_NO = #{ accountNo }
+		WHERE PROJECT_SEQ = #{ projectSeq } 
+	</update>
+	<update id="updateRepaymentByProjectSeq" parameterType="String">
+		UPDATE PROJECT SET REPAYMENT = #{ repayment }
+		WHERE PROJECT_SEQ = #{ projectSeq } 
+	</update>
+	<update id="updateProjectToScheduled" parameterType="String">
+		UPDATE PROJECT SET PROGRESS_CODE = 2
+		WHERE PROGRESS_CODE = 1
+		AND TO_CHAR(FUND_START, 'YYYY-MM-DD') = TO_CHAR(SYSDATE - INTERVAL '14' DAY, 'YYYY-MM-DD')
+	</update>
+</mapper>

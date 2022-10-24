@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.FundDAO">
+	<resultMap type="fundVO" id="fundVO">
+		<result column="fund_seq" property="fundSeq" />
+		<result column="project_seq" property="projectSeq" />
+		<result column="project_title" property="projectTitle" />
+		<result column="project_expire_date" property="projectExpireDate" />
+		<result column="member_account_no" property="memberAccountNo" />
+		<result column="member_id" property="memberId" />
+		<result column="member_name" property="memberName" />
+		<result column="fund_date" property="fundDate" />
+		<result column="payoff_status" property="payoffStatus" />
+		<result column="payoff_date" property="payoffDate" />
+	</resultMap>
+	<resultMap type="java.lang.Long" id="longList">
+		<result property="" column="COL_VAL"/>
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT FUND_SEQ,
+            F.PROJECT_SEQ,
+            P.TITLE AS PROJECT_TITLE,
+            TO_CHAR(P.SECURITY_EXPIRE, 'YYYY-MM-DD') AS PROJECT_EXPIRE_DATE,
+            F.MEMBER_ACCOUNT_NO,
+            A.MEMBER_ID,
+            REPLACE(M.NAME, SUBSTR(M.NAME, 2, 1), '*') AS MEMBER_NAME,
+            F.AMOUNT,
+            F.FUND_DATE,
+            ROUND((P.REPAYMENT / P.FUND_AMT) - 1, 1) AS PROCEEDS,
+            F.TAX,
+            F.FEE,
+            F.PAYOFF,
+            F.PAYOFF_STATUS,
+            F.PAYOFF_DATE
+        FROM FUND F, PROJECT P, ACCOUNT A, MEMBER M
+        WHERE F.PROJECT_SEQ = P.PROJECT_SEQ
+        AND F.MEMBER_ACCOUNT_NO = A.ACCOUNT_NO
+        AND A.MEMBER_ID = M.ID
+	</sql>
+	<sql id="selectOrder">
+        ORDER BY FUND_DATE DESC
+	</sql>
+	
+	
+	<!-- select -->
+	<select id="selectByFundSeq" parameterType="String" resultMap="fundVO">
+        <include refid="selectColumn" />
+        AND F.FUND_SEQ = #{ fundSeq }
+	</select>
+	<select id="selectByProjectSeq" parameterType="String" resultMap="fundVO">
+        <include refid="selectColumn" />
+        AND F.PROJECT_SEQ = #{ projectSeq }
+        <include refid="selectOrder" />
+        OFFSET 0 ROWS
+        FETCH NEXT 5 ROWS ONLY
+	</select>
+	<select id="selectCountByProjectSeq" parameterType="String" resultType="String">
+        SELECT COUNT(*)
+        FROM FUND
+        WHERE PROJECT_SEQ = #{ projectSeq }
+	</select>
+	<select id="selectPhoneListByProjectSeq" parameterType="String" resultType="String">
+        SELECT PHONE
+        FROM FUND F, MEMBER M, ACCOUNT A
+        WHERE F.MEMBER_ACCOUNT_NO = A.ACCOUNT_NO
+        AND A.MEMBER_ID = M.ID
+        AND PROJECT_SEQ = #{ projectSeq }
+	</select>
+
+	<!-- procedure -->
+	<select id="procedureCalProjectPayoff" parameterType="map" statementType="CALLABLE">
+	{
+		CALL P_FUND.CAL_PROJECT_PAYOFF(
+			#{ projectSeq }
+			, #{ calFundList, mode=OUT, jdbcType=CURSOR, javaType=java.sql.ResultSet, resultMap=fundVO }
+	)
+	</select>
+	
+	<!-- block -->
+	<select id="blockUpdatePayoffStatus" parameterType="map" statementType="CALLABLE">
+	{
+		CALL
+		DECLARE
+		BEGIN
+			
+			<foreach collection="resultMap" item="status" index="key">
+			UPDATE FUND SET PAYOFF_STATUS = #{status} WHERE FUND_SEQ = #{key};
+			</foreach>
+			
+			UPDATE PROJECT SET PROGRESS_CODE = 5
+			WHERE PROJECT_SEQ = #{projectSeq};
+			
+			COMMIT;
+			
+		END
+	}
+	</select>
+	<select id="blockGetTrendsInFund" parameterType="String" resultType="hashmap">
+		SELECT TO_CHAR(DATES, 'YYYY-MM-DD') AS DAY, SUM(NVL(AMOUNT, 0)) OVER(ORDER BY DATES) AS AMOUNT
+		FROM (SELECT FUND_START + LEVEL - 1 AS DATES
+		        FROM (SELECT FUND_START, FUND_END
+		        FROM PROJECT
+		        WHERE PROJECT_SEQ = #{ projectSeq }) 
+		        CONNECT BY LEVEL  <![CDATA[<=]]> (FUND_END - FUND_START) + 1) 
+		    LEFT OUTER JOIN (SELECT TO_CHAR(FUND_DATE, 'YYYY-MM-DD') AS FUND_DATE, SUM(AMOUNT) AS AMOUNT
+		        FROM FUND
+		        WHERE PROJECT_SEQ = #{ projectSeq }
+		        GROUP BY TO_CHAR(FUND_DATE, 'YYYY-MM-DD'))
+		ON DATES = FUND_DATE
+		ORDER BY DATES
+	</select>
+</mapper>

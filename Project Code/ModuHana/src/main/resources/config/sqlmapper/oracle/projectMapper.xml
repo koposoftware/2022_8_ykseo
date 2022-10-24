@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ProjectDAO">
+	<resultMap type="projectVO" id="projectVO">
+		<result column="PROJECT_SEQ" property="projectSeq" />
+		<result column="SUBJECT_NO" property="subjectNo" />
+		<result column="SUBJECT_NAME" property="subjectName" />
+		<result column="SIGN_IMG_PATH" property="signImgPath" />
+		<result column="SIGN_IMG_NAME" property="signImgName" />
+		<result column="FUND_AMT" property="fundAmt" />
+		<result column="FUND_AMT_PER" property="fundAmtPer" />
+		<result column="MIN_FUND_UNIT" property="minFundUnit" />
+		<result column="MAX_FUND_UNIT" property="maxFundUnit" />
+		<result column="MIN_FUND_AMT" property="minFundAmt" />
+		<result column="MAX_FUND_AMT" property="maxFundAmt" />
+		<result column="FUND_START" property="fundStart" />
+		<result column="FUND_END" property="fundEnd" />
+		<result column="START_D_DAY" property="startDDay" />
+		<result column="END_D_DAY" property="endDDay" />
+		<result column="PROGRESS_CODE" property="progressCode" />
+		<result column="PROGRESS_NAME" property="progressName" />
+		<result column="REG_DATE" property="regDate" />
+		<result column="APPLY_DATE" property="applyDate" />
+		<result column="APRV_DATE" property="aprvDate" />
+		<result column="CORP_REG_NO" property="corpRegNo" />
+		<result column="CORP_NAME" property="corpName" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="EST_BEP" property="estBep" />
+		<result column="SECURITY_TYPE" property="securityType" />
+		<result column="SECURITY_NAME" property="securityName" />
+		<result column="REPAYMENT_CODE" property="repaymentCode" />
+		<result column="REPAYMENT_NAME" property="repaymentName" />
+		<result column="SECURITY_DATE" property="securityDate" />
+		<result column="SECURITY_EXPIRE" property="securityExpire" />
+		<result column="REPAYMENT_DATE" property="repaymentDate" />
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT P.PROJECT_SEQ
+			, P.SUBJECT_NO
+			, C.NAME AS SUBJECT_NAME
+			, P.TITLE
+			, P.SUMMARY
+			, P.CONTENT
+			, P.FUND_AMT
+			, TO_CHAR(ROUND(P.FUND_AMT / MAX_FUND_AMT * 100, 1)||'%') AS FUND_AMT_PER
+			, P.MIN_FUND_UNIT
+			, P.MAX_FUND_UNIT
+			, P.MIN_FUND_AMT
+			, P.MAX_FUND_AMT
+			, TO_CHAR(P.FUND_START, 'YYYY-MM-DD') AS FUND_START
+			, TO_CHAR(P.FUND_END, 'YYYY-MM-DD') AS FUND_END
+			, P.FUND_START - TRUNC(SYSDATE) AS START_D_DAY
+			, P.FUND_END - TRUNC(SYSDATE) AS END_D_DAY
+			, P.PROGRESS_CODE
+			, C2.NAME AS PROGRESS_NAME
+			, CORP_REG_NO
+			, CORP.NAME AS CORP_NAME
+            , P.ACCOUNT_NO
+            , P.EST_BEP
+            , P.SECURITY_TYPE
+            , C3.NAME AS SECURITY_NAME
+            , P.REPAYMENT_CODE
+            , C4.NAME AS REPAYMENT_NAME
+            , TO_CHAR(P.SECURITY_DATE, 'YYYY-MM-DD') AS SECURITY_DATE
+            , TO_CHAR(P.SECURITY_EXPIRE, 'YYYY-MM-DD') AS SECURITY_EXPIRE
+            , P.REPAYMENT
+            , P.REPAYMENT_DATE
+    </sql>
+    <sql id="selectColumnFile">
+			, F.PATH AS SIGN_IMG_PATH
+			, F.SAVE_NAME AS SIGN_IMG_NAME
+		FROM PROJECT P, PROJECT_FILE F, CORPORATION CORP, COMM_CODE C, COMM_CODE C2, COMM_CODE C3, COMM_CODE C4
+    </sql>
+    <sql id="selectFrom">
+    	FROM PROJECT P, CORPORATION CORP, COMM_CODE C, COMM_CODE C2, COMM_CODE C3, COMM_CODE C4
+    </sql>
+	<sql id="selectWhere">
+		WHERE P.CORP_REG_NO = CORP.REG_NO
+		AND P.SUBJECT_NO = C.CODE
+		AND P.PROGRESS_CODE = C2.CODE
+		AND P.SECURITY_TYPE = C3.CODE
+		AND P.REPAYMENT_CODE = C4.CODE
+		AND C.CODE_ID = 210
+		AND C.AVAILABLE = 'Y'
+		AND C2.CODE_ID = 200
+		AND C2.AVAILABLE = 'Y'
+		AND C3.CODE_ID = 110
+		AND C3.AVAILABLE = 'Y'
+		AND C4.CODE_ID = 120
+		AND C4.AVAILABLE = 'Y'
+	</sql>
+	<sql id="selectWhereFile">
+		AND P.PROJECT_SEQ = F.PROJECT_SEQ
+        AND F.TYPE_CODE = 0
+	</sql>
+	<sql id="selectOrder">
+		ORDER BY PROGRESS_CODE
+	</sql>
+	<sql id="selectNine">
+        OFFSET 0 ROWS
+        FETCH NEXT 9 ROWS ONLY
+	</sql>
+	
+	
+	<!-- select -->
+	<select id="selectBySubjectNo" parameterType="String"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		<include refid="selectColumnFile" />
+		<include refid="selectWhere" />
+		<include refid="selectWhereFile" />
+		AND P.PROGRESS_CODE IN(2, 3, 4, 5, 7, 10, 11)
+		AND P.SUBJECT_NO = #{ subjectNo }
+		<include refid="selectOrder" />
+		<include refid="selectNine" />
+	</select>
+	<select id="selectAll" parameterType="String"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		<include refid="selectColumnFile" />
+		<include refid="selectWhere" />
+		<include refid="selectWhereFile" />
+		AND P.PROGRESS_CODE IN(2, 3, 4, 5, 7, 10, 11)
+		<include refid="selectOrder" />
+		<include refid="selectNine" />
+	</select>
+	<select id="selectByProjectSeq" parameterType="String"
+		resultMap="projectVO">
+		<include refid="selectColumn" />
+		<include refid="selectFrom" />
+		<include refid="selectWhere" />
+		AND P.PROJECT_SEQ = #{ projectSeq }
+	</select>
+</mapper>

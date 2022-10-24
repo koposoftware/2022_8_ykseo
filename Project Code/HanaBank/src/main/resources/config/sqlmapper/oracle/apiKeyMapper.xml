@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ApiKeyDAO">
+
+	<!-- select -->
+	<select id="selectByApikey" parameterType="String"
+		resultType="String">
+		SELECT  CORP_REG_NO
+		FROM API_KEY
+		WHERE API_CODE = 1
+		AND API_KEY = #{ apiKey }
+	</select>
+	
+</mapper>

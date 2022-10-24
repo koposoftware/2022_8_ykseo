@@ -34,14 +34,14 @@
 
 ## 3-2. 서비스 아키텍처
 <img src="service_architecture.png" style="width:100%"/><br>
+- 하나은행과 Open API로 연계되어 운영됩니다.
+- 사용자 역할 별 서비스가 구분됩니다.
 - 투자자는 예치금 계좌의 생성과 조회, 이체 서비스를 사용할 수 있습니다.
 - 투자자는 프로젝트(투자상품)에 투자할 수 있습니다.
 - 투자자는 투자 내역 및 현황을 포함한 회원정보를 확인할 수 있습니다.
 - 크리에이터는 투자받고 싶은 프로젝트를 신창할 수 있습니다.
 - 관리자는 프로젝트를 관리할 수 있으며, 수익금을 정산할 수 있습니다.
 
-- 사용자 역할 별 서비스가 구분됩니다.
-- 하나은행과 Open API로 연계되어 운영됩니다.
 
 ## 3-3. 하나은행 OPEN API 문서
 [문서링크 - https://summer-run-769.notion.site/HanaBank-2b896d4edcd641c584db929fc8341848 <img src="api_doc.png"/>](https://summer-run-769.notion.site/HanaBank-2b896d4edcd641c584db929fc8341848)

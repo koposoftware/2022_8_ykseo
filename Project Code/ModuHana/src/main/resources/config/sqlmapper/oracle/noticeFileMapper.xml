@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.NoticeFileDAO">
+	<resultMap type="noticeFileVO" id="noticeFileVO">
+		<result column="FILE_SEQ" property="fileSeq" />
+		<result column="NOTICE_SEQ" property="noticeSeq" />
+		<result column="ORI_NAME" property="oriName" />
+		<result column="SAVE_NAME" property="saveName" />
+		<result column="FILE_SIZE" property="fileSize" />
+	</resultMap>
+
+	<!-- sql -->
+	<sql id="selectColumn">
+		SELECT FILE_SEQ
+			, NOTICE_SEQ
+			, PATH
+			, ORI_NAME
+			, SAVE_NAME
+			, FILE_SIZE
+		FROM NOTICE_FILE
+	</sql>
+	
+	
+	<!-- select -->
+	<select id="selectByNoticeSeq" parameterType="String"
+		resultMap="noticeFileVO">
+		<include refid="selectColumn" />
+		WHERE NOTICE_SEQ = #{ noticeSeq }
+	</select>
+</mapper>

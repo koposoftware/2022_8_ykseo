@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="kr.ac.kopo.vo.MemberVO" alias="memberVO" />
+		<typeAlias type="kr.ac.kopo.vo.AccountVO" alias="accountVO" />
+		<typeAlias type="kr.ac.kopo.vo.FundVO" alias="fundVO" />
+		<typeAlias type="kr.ac.kopo.vo.CommCodeVO" alias="commCodeVO" />
+		<typeAlias type="kr.ac.kopo.vo.ProjectVO" alias="projectVO" />
+		<typeAlias type="kr.ac.kopo.vo.ProjectFileVO" alias="projectFileVO" />
+		<typeAlias type="kr.ac.kopo.vo.NoticeVO" alias="noticeVO" />
+		<typeAlias type="kr.ac.kopo.vo.NoticeFileVO" alias="noticeFileVO" />
+		<typeAlias type="kr.ac.kopo.vo.ReplyVO" alias="replyVO" />
+	</typeAliases>
+	
+</configuration>
